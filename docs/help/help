@@ -1,0 +1,9 @@
+# Importação de Tabelas para o Drupal 9
+
+Este script irá importar todas as tabelas do drupal 7 para o drupal 9.
+
+Crie o seu arquivo "config/config.php" e coloque ali a configuração de acesso ao banco de origem (source) e destino (target).
+Siga o exemplo do arquivo "config.example.php"
+
+Você pode colocar também a ordem com as tabelas serão importadas.
+

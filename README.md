@@ -1,2 +1,7 @@
-# import_drupal_db_9
-Executa a importação de uma versão drupal antiga, para versão 9.
+# Importação DB 9
+Script para importação de banco de dados para o Drupal 9
+
+### Instalação
+```
+$ composer require adrianodemoura/import_drupal_db_9
+```
