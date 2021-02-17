@@ -1,19 +1,34 @@
 <?php
 declare(strict_types=1);
 
-namespace ImportDrupalDb9\Import;
+namespace ImportDrupalDb9\Core\Import;
 
-use ImportDrupalDb9\Configure\Configure;
+use ImportDrupalDb9\Core\Configure\Configure;
+use ImportDrupalDb9\Core\Database\Query;
 use PDO;
 
-class ImportMysql {
+class ImportMysql extends Query {
 
 	/**
 	 * Configuraçãos do banco de dados, de origem e destino.
 	 *
 	 * @var 	array
 	 */
-	private $configDb = ['source'=> [], 'target'=>[] ];
+	protected $configDb = ['source'=> [], 'target'=>[] ];
+
+	/**
+	 * Conexão com o banco de origem.
+	 *
+	 * @var 	Object
+	 */
+	protected $sourceDb = [];
+
+	/**
+	 * Conexão com o banco de destino.
+	 *
+	 * @var 	Object
+	 */
+	protected $targetDb = [];
 
 	/**
 	 * Método start
@@ -33,6 +48,7 @@ class ImportMysql {
 	public function __destruct()
 	{
 		$this->sourceDb = null;
+		$this->targetDb = null;
 	}
 
 	/**

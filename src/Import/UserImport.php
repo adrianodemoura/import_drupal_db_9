@@ -1,22 +1,31 @@
 <?php
+declare(strict_types=1);
 
 namespace ImportDrupalDb9\Import;
 
-use ImportDrupalDb9\Import\ImportMysql;
+use ImportDrupalDb9\Core\Import\ImportMysql;
+use ImportDrupalDb9\Core\Configure\Configure;
+use PDO;
 
 class UserImport extends ImportMysql {
+
+	protected $tableTargetName = 'user';
+
+	protected $tableSourceName = 'users';
 	
 	public function execute()
 	{
-		$retorno 	= (object)['status'=>true, 'total'=>rand(5,50), 'message'=>'sucesso'];
+		$retorno 		= (object)['status'=>true, 'total'=>rand(5,50), 'message'=>'sucesso'];
 
-		/*$configDb 	= include DIR_IMPORT_DB_9 . "/config/config.php";
+		$configDb 		= Configure::read('databases');
+		$tablePrefixD7 	= isset( $configDb['source']['table_prefix'] ) ? $configDb['source']['table_prefix'] : '';
 
-		$tablePrefix= @$configDb['Databases']['source']['table_prefix'];
+		$dataUser = $this
+			->where( ['uid >'=> 0] )
+			->findSource()
+			->toArray();
 
-		$dataUser 	= $connSource
-			->query( "SELECT * from ${tablePrefix}users" )
-			->fetchAll( \PDO::FETCH_ASSOC );*/
+		$retorno->total = count( $dataUser );
 
 		return $retorno;
 	}

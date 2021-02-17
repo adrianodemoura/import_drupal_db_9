@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-namespace ImportDrupalDb9\Configure;
+namespace ImportDrupalDb9\Core\Configure;
 
 class Configure {
 
