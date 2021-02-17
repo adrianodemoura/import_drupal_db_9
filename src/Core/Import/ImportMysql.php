@@ -31,6 +31,13 @@ class ImportMysql extends Query {
 	protected $targetDb = [];
 
 	/**
+	 * Se true, grava no temporaŕio todas as sqls, executadas.
+	 *
+	 * @var 	boolean
+	 */
+	private $logSql 	= false;
+
+	/**
 	 * Método start
 	 *
 	 * @return 	void
@@ -71,5 +78,26 @@ class ImportMysql extends Query {
 		$targetDsn 		= "mysql:host={$this->configDb['target']['host']};dbname={$this->configDb['target']['database']};port={$this->configDb['target']['port']}";
 		$this->targetDb = new PDO( $targetDsn, $this->configDb['target']['username'], $this->configDb['target']['password'] );
 		$this->targetDb->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+	}
+
+	/**
+	 * Método mágico get
+	 *
+	 * @param 	string 	$attribute 	Nome do atributo a ser retornado.
+	 * @return 	mixed 	Valor do atributo.
+	 */
+	public function __get( $attribute='' )
+	{
+		return $this->$attribute;
+	}
+
+	/**
+	 * Método mágico set
+	 *
+	 * @return 	void
+	 */
+	public function __set( $attribute='', $vlr=null )
+	{
+		$this->$attribute = $vlr;
 	}
 }

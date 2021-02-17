@@ -12,8 +12,6 @@ class Query {
 
 	private $where 	= [];
 
-	protected $logSql = true;
-
 	private function getFields() : string
 	{
 		if ( empty($this->fields) )
@@ -72,7 +70,7 @@ class Query {
 
 		$sql 			= "SELECT $fields from $tableName $where $group $order";
 
-		if ( $this->logSql ) { gravaLog( $sql, 'sql_source', 'a+' ); }
+		if ( $this->__get('logSql') ) { gravaLog( $sql, 'sql_source', 'a+' ); }
 
 		$this->result 	= $this->sourceDb->query( $sql );
 
