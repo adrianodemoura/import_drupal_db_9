@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace ImportDrupalDb9\Core\Import;
 
 use ImportDrupalDb9\Core\Configure\Configure;
+use Exception;
 use PDO;
 
 class ImportMysql {
@@ -150,7 +151,7 @@ class ImportMysql {
 	 * @param 	string 	$attribute 	Nome do atributo a ser retornado.
 	 * @return 	mixed 	Valor do atributo.
 	 */
-	public function __get( $attribute='' )
+	public function __get( string $attribute='' )
 	{
 		return $this->$attribute;
 	}
@@ -160,7 +161,7 @@ class ImportMysql {
 	 *
 	 * @return 	void
 	 */
-	public function __set( $attribute='', $vlr=null )
+	public function __set( string $attribute='', $vlr=null )
 	{
 		$this->$attribute = $vlr;
 	}
@@ -183,8 +184,14 @@ class ImportMysql {
 	 * @param 	string 	$db 	Nome da conexão, source ou target.
 	 * @return 	this
 	 */
-	public function db( $db='source' )
+	public function db( string $db='source' )
 	{
+		if ( !in_array( $db, ['source', 'target'] ) )
+		{
+			dump("Erro ao selecionar database", true );
+			throw new Exception( "Database inválido !!!", 1);
+		}
+
 		$this->selectDb = $db;
 
 		return $this;
@@ -196,14 +203,14 @@ class ImportMysql {
 	 * @param 	string 	$sql 	Sql a ser executada.
 	 * @return 	this
 	 */
-	public function query( $sql="" )
+	public function query( string $sql="" )
 	{
 		if ( $this->logSql ) gravaLog( date("Y-m-d H:i:s") . " " . $this->selectDb . " " . $sql, $this->selectDb, 'a+' );
 
 		if ( $this->selectDb === 'source' )
 		{
 			$this->result = $this->sourceDb->query( $sql );
-		} else
+		} elseif ( $this->selectDb === 'target' )
 		{
 			$this->result = $this->targetDb->query( $sql );
 		}
@@ -218,6 +225,6 @@ class ImportMysql {
 	 */
 	public function toArray() : array
 	{
-		return $this->result->fetchAll( PDO::FETCH_ASSOC );
+		return @$this->result->fetchAll( PDO::FETCH_ASSOC );
 	}
 }
