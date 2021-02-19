@@ -7,7 +7,7 @@ try
 
 	include_once DIR_IMPORT_DB_9 . '/includes/bootstrap.php';
 
-	if ( in_array( strtolower( isset($_SERVER['argv'][1])?$_SERVER['argv'][1]:''), ['--help', '-h', '-help'] ) ) { throw new Exception( 'printar ajuda', 1); }
+	if ( in_array( strtolower( isset($_SERVER['argv'][1])?$_SERVER['argv'][1]:''), ['--help', '-h', '-help'] ) ) { throw new Exception( 'printar ajuda', 191130); }
 
 	$config = @ include_once DIR_IMPORT_DB_9 . '/config/config.php';
 
@@ -26,15 +26,16 @@ try
 		$retorno 	= $Import->execute();
 
 		gravaLog( $retorno, 'resultado_importacao_'.$_class );
+
+		echo $retorno."\n";
 	}
 
-	echo "success: ".count($listaImportacao)." entidade(s) importadas com sucesso. \n";
-
-} catch ( Exception $e)
+	//echo "success: ".count($listaImportacao)." entidade(s) importadas com sucesso. \n";
+} catch ( Exception $e )
 {
 	switch ( $e->getCode() )
 	{
-		case 1:
+		case 191130:
 			include_once DIR_IMPORT_DB_9 . '/docs/help/help';
 			break;
 		

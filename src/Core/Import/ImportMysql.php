@@ -30,6 +30,20 @@ class ImportMysql {
 	protected $targetDb = [];
 
 	/**
+	 * Banco selecionado, source ou target.
+	 *
+	 * @var 	string
+	 */
+	protected $selectDb = 'source';
+
+	/**
+	 * Resultado da última query.
+	 *
+	 * @var 	mixed
+	 */
+	protected $result 	= null;
+
+	/**
 	 * Se true, grava no temporaŕio todas as sqls, executadas.
 	 *
 	 * @var 	boolean
@@ -69,6 +83,43 @@ class ImportMysql {
 	{
 		$this->sourceDb = null;
 		$this->targetDb = null;
+	}
+
+	/**
+	 * Inicia a transação do banco.
+	 *
+	 * @return void
+	 */
+	private function begin()
+	{
+		return ( !$this->transactionCounter++ ) ? $this->targetDb->beginTransaction() : $this->transactionCounter >= 0;
+	}
+
+	/**
+	 * Executa o commit do banco.
+	 *
+	 * @return mixed
+	 */
+	private function commit()
+	{
+		return (!--$this->transactionCounter) ? $this->targetDb->commit() : $this->transactionCounter >= 0;
+	}
+
+	/**
+	 * Executa o rollback do banco.
+	 *
+	 * @return mixed
+	 */
+	private function rollback()
+	{
+		if ( $this->transactionCounter >= 0 )
+        {
+            $this->transactionCounter = 0;
+            return $this->targetDb->rollback();
+        }
+
+        $this->transactionCounter = 0;
+        return false;
 	}
 
 	/**
@@ -115,39 +166,58 @@ class ImportMysql {
 	}
 
 	/**
-	 * Inicia a transação do banco.
+	 * Executa a ação de importação.
 	 *
-	 * @return void
+	 * @return 	string 	$msg 	Mensagem da operação.
 	 */
-	private function begin()
+	public function execute() : string
 	{
-		return ( !$this->transactionCounter++ ) ? $this->targetDb->beginTransaction() : $this->transactionCounter >= 0;
+		$msg = "";
+
+		return $msg;
 	}
 
 	/**
-	 * Executa o commit do banco.
+	 * Configura a última conexão usada.
 	 *
-	 * @return mixed
+	 * @param 	string 	$db 	Nome da conexão, source ou target.
+	 * @return 	this
 	 */
-	private function commit()
+	public function db( $db='source' )
 	{
-		return (!--$this->transactionCounter) ? $this->targetDb->commit() : $this->transactionCounter >= 0;
+		$this->selectDb = $db;
+
+		return $this;
 	}
 
 	/**
-	 * Executa o rollback do banco.
+	 * Executa um query, no banco source ou target.
 	 *
-	 * @return mixed
+	 * @param 	string 	$sql 	Sql a ser executada.
+	 * @return 	this
 	 */
-	private function rollback()
+	public function query( $sql="" )
 	{
-		if ( $this->transactionCounter >= 0 )
-        {
-            $this->transactionCounter = 0;
-            return $this->targetDb->rollback();
-        }
+		if ( $this->logSql ) gravaLog( date("Y-m-d H:i:s") . " " . $this->selectDb . " " . $sql, $this->selectDb, 'a+' );
 
-        $this->transactionCounter = 0;
-        return false;
+		if ( $this->selectDb === 'source' )
+		{
+			$this->result = $this->sourceDb->query( $sql );
+		} else
+		{
+			$this->result = $this->targetDb->query( $sql );
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Retorna o resultado de uma query
+	 *
+	 * @return 	array 	array 	Resultado da query em array;
+	 */
+	public function toArray() : array
+	{
+		return $this->result->fetchAll( PDO::FETCH_ASSOC );
 	}
 }

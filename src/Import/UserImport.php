@@ -12,13 +12,17 @@ class UserImport extends ImportMysql {
 	 *
 	 * @return 	string 	$msg 	Mensagem de estatus.
 	 */
-	public function execute()
+	public function execute() : string
 	{
-		$msg 	= "x usuários importados com sucesso.";
+		$this->__set('logSql', true );
 
-		$res 	= $this->sourceDb->query( $this->getSourceSqlUsers() )->fetchAll(  );
+		$msg 	= "{x} usuários importados com sucesso.";
 
-		dump( $res );
+		$res 	= $this->db('source')
+			->query( $this->getSourceSqlUsers() )
+			->toArray();
+
+		$msg 	= str_replace( "{x}", count($res), $msg );
 
 		return $msg;
 	}
@@ -32,7 +36,7 @@ class UserImport extends ImportMysql {
 	{
 		$sourceTablePrefix 	= $this->configDb['source']['table_prefix'];
 
-		$sql = "SELECT * FROM {$sourceTablePrefix}users";
+		$sql = "SELECT * FROM {$sourceTablePrefix}users WHERE uid>0";
 		$sql .= "";
 
 		return $sql;
