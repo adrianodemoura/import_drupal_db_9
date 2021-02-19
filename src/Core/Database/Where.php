@@ -30,6 +30,6 @@ class Where {
 			$_where .= $field." ".$operator." ".$_vlr;
 		}
 
-		return "WHERE $_where";
+		return $_where;
 	}
 }

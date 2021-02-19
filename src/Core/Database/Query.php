@@ -12,6 +12,10 @@ class Query {
 
 	private $where 	= [];
 
+	private $page 	= 0;
+
+	private $range 	= 10;
+
 	private function getFields() : string
 	{
 		if ( empty($this->fields) )
@@ -27,7 +31,7 @@ class Query {
 
 	private function getWhere() : string
 	{
-		return Where::convert( $this->where );
+		return !empty($this->where) ? "WHERE ".Where::convert( $this->where ) : "";
 	}
 
 	private function getGroup() : string
@@ -56,9 +60,24 @@ class Query {
 		return $order;
 	}
 
-	public function findSource()
+	public function findSource() 
 	{
-		$tableName 		= $this->configDb['source']['table_prefix'] . $this->tableSourceName;
+		$this->origin = 'source';
+
+		return $this->find();
+	}
+
+	public function findTarget() 
+	{
+		$this->origin = 'target';
+
+		return $this->find();
+	}
+
+	public function find()
+	{
+		$tableName 		= $this->configDb[$this->origin]['table_prefix'] 
+			. ( ($this->origin==='source') ? $this->tableSourceName : $this->tableTargetName );
 
 		$fields 		= $this->getFields();
 
@@ -68,9 +87,11 @@ class Query {
 
 		$order 			= $this->getOrder();
 
-		$sql 			= "SELECT $fields from $tableName $where $group $order";
+		$originDb 		= $this->origin."Db";
 
-		if ( $this->__get('logSql') ) { gravaLog( $sql, 'sql_source', 'a+' ); }
+		$sql 			= $this->$originDb->driverDb->query( $fields, $tableName, $where, $group, $order, $this->page, $this->range );
+
+		if ( $this->__get('logSql') ) { gravaLog( $sql, 'sql_'.$this->origin, 'a+' ); }
 
 		$this->result 	= $this->sourceDb->query( $sql );
 
@@ -99,6 +120,20 @@ class Query {
 	public function order( array $order=[] )
 	{
 		$this->order = $order;
+
+		return $this;
+	}
+
+	public function page( int $page=1 )
+	{
+		$this->page = $page;
+
+		return $this;
+	}
+
+	public function range( int $range=10 )
+	{
+		$this->range = $range;
 
 		return $this;
 	}
