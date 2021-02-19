@@ -17,7 +17,11 @@ try
 
 	if ( empty($listaImportacao) ) { throw new Exception( "Nenhuma entidade foi configurada para importação. Verifique se a tag \"import\" foi informada no arquivo \"config/config.php\".", 2); }
 
-	foreach( $listaImportacao as $_l => $_class )
+	$comando = "mysqldump -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} > ".DIR_IMPORT_DB_9."/bkp/".date('Y-m-d_H-i_s')."_dump_bd_9.sql";
+
+	exec($comando);	
+
+	/*foreach( $listaImportacao as $_l => $_class )
 	{
 		$fullClass 	= "ImportDrupalDb9\\Import\\" . ucfirst( strtolower( $_class ) ) . "Import";
 
@@ -28,7 +32,7 @@ try
 		gravaLog( $retorno, 'resultado_importacao_'.$_class );
 
 		echo $retorno."\n";
-	}
+	}*/
 
 	//echo "success: ".count($listaImportacao)." entidade(s) importadas com sucesso. \n";
 } catch ( Exception $e )
