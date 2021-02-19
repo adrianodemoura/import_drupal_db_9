@@ -4,27 +4,37 @@ declare(strict_types=1);
 namespace ImportDrupalDb9\Import;
 
 use ImportDrupalDb9\Core\Import\ImportMysql;
-use ImportDrupalDb9\Core\Configure\Configure;
 
 class UserImport extends ImportMysql {
 
-	protected $tableTargetName = 'user';
-
-	protected $tableSourceName = 'users';
-	
+	/**
+	 * Executa a importação dos usuários
+	 *
+	 * @return 	string 	$msg 	Mensagem de estatus.
+	 */
 	public function execute()
 	{
-		$retorno 		= (object)['status'=>true, 'total'=>rand(5,50), 'message'=>'sucesso'];
+		$msg 	= "x usuários importados com sucesso.";
 
-		//$this->__set('logSql', true);
+		$res 	= $this->sourceDb->query( $this->getSourceSqlUsers() )->fetchAll(  );
 
-		$dataUser = $this
-			->where( ['uid >' => 0] )
-			->findSource()
-			->toArray();
+		dump( $res );
 
-		$retorno->total = count( $dataUser );
+		return $msg;
+	}
 
-		return $retorno;
+	/**
+	 * Retorna a sql que recuperar todos os uusuários do banco de origem.
+	 *
+	 * @return 	string 	$sql 	$sql de usuários
+	 */
+	private function getSourceSqlUsers() : string
+	{
+		$sourceTablePrefix 	= $this->configDb['source']['table_prefix'];
+
+		$sql = "SELECT * FROM {$sourceTablePrefix}users";
+		$sql .= "";
+
+		return $sql;
 	}
 }

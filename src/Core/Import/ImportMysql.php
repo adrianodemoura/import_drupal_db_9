@@ -4,10 +4,9 @@ declare(strict_types=1);
 namespace ImportDrupalDb9\Core\Import;
 
 use ImportDrupalDb9\Core\Configure\Configure;
-use ImportDrupalDb9\Core\Database\Query;
 use PDO;
 
-class ImportMysql extends Query {
+class ImportMysql {
 
 	/**
 	 * Configuraçãos do banco de dados, de origem e destino.
@@ -36,6 +35,20 @@ class ImportMysql extends Query {
 	 * @var 	boolean
 	 */
 	private $logSql 	= false;
+
+	/**
+	 * Último erro
+	 *
+	 * @var 	string
+	 */
+	protected $lastError= "";
+
+	/**
+	 * contador de transcações
+	 *
+	 * @var 	int
+	 */
+	protected $transactionCounter = 0;
 
 	/**
 	 * Método start
@@ -99,5 +112,42 @@ class ImportMysql extends Query {
 	public function __set( $attribute='', $vlr=null )
 	{
 		$this->$attribute = $vlr;
+	}
+
+	/**
+	 * Inicia a transação do banco.
+	 *
+	 * @return void
+	 */
+	private function begin()
+	{
+		return ( !$this->transactionCounter++ ) ? $this->targetDb->beginTransaction() : $this->transactionCounter >= 0;
+	}
+
+	/**
+	 * Executa o commit do banco.
+	 *
+	 * @return mixed
+	 */
+	private function commit()
+	{
+		return (!--$this->transactionCounter) ? $this->targetDb->commit() : $this->transactionCounter >= 0;
+	}
+
+	/**
+	 * Executa o rollback do banco.
+	 *
+	 * @return mixed
+	 */
+	private function rollback()
+	{
+		if ( $this->transactionCounter >= 0 )
+        {
+            $this->transactionCounter = 0;
+            return $this->targetDb->rollback();
+        }
+
+        $this->transactionCounter = 0;
+        return false;
 	}
 }
