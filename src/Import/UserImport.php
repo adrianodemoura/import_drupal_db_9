@@ -22,15 +22,23 @@ class UserImport extends ImportMysql {
 	{
 		$this->__set('logSql', true );
 
-		$msg 	= "{x} usuários importados com sucesso.";
-
 		if ( $this->cleanTarget ) $this->cleanTarget();
 
+		$totalUsuariosImportados = $this->importUsers();
+
+		return "{$totalUsuariosImportados} importados com sucesso.\n";
+	}
+
+	/**
+	 * Executa a importação dos usuários
+	 *
+	 * @return 	int 	$totalUsuarios 	Total de usuáriso importados.
+	 */
+	private function importUsers() : int
+	{
 		$res 	= $this->db('source')->query( $this->getSourceSqlUsers() )->toArray();
 
-		$msg 	= str_replace( "{x}", count($res), $msg );
-
-		return $msg;
+		return count( $res );
 	}
 
 	/**
@@ -44,18 +52,17 @@ class UserImport extends ImportMysql {
 
 		$targetTablePrefix = $this->configDb['target']['table_prefix'];
 
-		$totalUsuarios = @$this->db('target')
-			->query( "SELECT COUNT(1) as total_usuarios FROM {$targetTablePrefix}users_field_data" )
-			->toArray()['total_usuarios'];
+		$totalUsuarios = @$this->db('target')->query( "SELECT COUNT(1) as total_usuarios FROM {$targetTablePrefix}users_field_data" )->toArray()['total_usuarios'];
 
-		if ( $totalUsuarios )
+		$listaTabelasUsuario = ['users_field_data', 'users'];
+
+		foreach( $listaTabelasUsuario as $_l => $_tabela )
 		{
-			$sql = "DELETE FROM {$targetTablePrefix}users_field_data WHERE uid>0";
-
+			$sql = "DELETE FROM {$targetTablePrefix}{$_tabela} WHERE uid>0";
 			$res = $this->db('target')->query( $sql );
-
-			echo "{$totalUsuarios} usuários excluídos com sucesso ... ";
 		}
+
+		if ( $totalUsuarios ) echo "{$totalUsuarios} usuários excluídos com sucesso ...\n";
 	}
 
 	/**
@@ -67,8 +74,10 @@ class UserImport extends ImportMysql {
 	{
 		$sourceTablePrefix = $this->configDb['source']['table_prefix'];
 
-		$sql = "SELECT * FROM {$sourceTablePrefix}users WHERE uid>0 AND uid<10";
-		$sql .= "";
+		$sql  = "SELECT * FROM {$sourceTablePrefix}users u";
+		$sql .= " LEFT JOIN {$sourceTablePrefix}users_roles ur  ON ur.uid  = u.uid";
+		$sql .= " LEFT JOIN {$sourceTablePrefix}userprotect upr ON upr.uid = u.uid";
+		$sql .= " WHERE u.uid>0 AND u.uid<100";
 
 		return $sql;
 	}

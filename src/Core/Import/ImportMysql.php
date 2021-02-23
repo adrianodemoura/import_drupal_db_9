@@ -205,7 +205,7 @@ class ImportMysql {
 	 */
 	public function query( string $sql="" )
 	{
-		if ( $this->logSql ) gravaLog( date("Y-m-d H:i:s") . " " . $this->selectDb . " " . $sql, $this->selectDb, 'a+' );
+		if ( $this->logSql ) gravaLog( date("Y-m-d H:i:s") . " " . $this->selectDb . " " . $sql, 'sql_'.$this->selectDb, 'a+' );
 
 		if ( $this->selectDb === 'source' )
 		{
