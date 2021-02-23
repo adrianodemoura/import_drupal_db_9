@@ -44,7 +44,11 @@ class UserImport extends ImportMysql {
 		$uidJaIncluso 		= [];
 
 		$totalSalvos 		= 0;
-		//$S$E26OJxEl2d6TIpG1WLqB78VtXaFfuvOPoBADkUeVV3FxQ44kYf2A
+
+		$senhaPadrao 		= '$S$ECpkmLmTDrOnrL6u0aJb8f2amHuXkQKW0SIqOKQwxYQ6nsFO92lW';
+		// AdminDrupal9_6701! $S$E26OJxEl2d6TIpG1WLqB78VtXaFfuvOPoBADkUeVV3FxQ44kYf2A
+		// sgt219 $S$DBhGJs6wx.ImKwG/cG0vgv3xHgROPvhURS6E.es3yX5RZwLpSNub
+		// MudarSenha9_6701! $S$ECpkmLmTDrOnrL6u0aJb8f2amHuXkQKW0SIqOKQwxYQ6nsFO92lW
 
 		foreach( $sourceUsers as $_l => $_arrFields )
 		{
@@ -86,7 +90,7 @@ class UserImport extends ImportMysql {
 					, '{$_arrFields['login']}'
 					, '{$_arrFields['mail']}'
 					, '{$_arrFields['name']}'
-					, '{$_arrFields['pass']}'
+					, '{$senhaPadrao}'
 					, '{$_arrFields['language']}'
 					, {$_arrFields['status']}
 					, '{$_arrFields['timezone']}' )";
