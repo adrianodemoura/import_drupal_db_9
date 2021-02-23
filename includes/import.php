@@ -7,23 +7,24 @@ try
 
 	include_once DIR_IMPORT_DB_9 . '/includes/bootstrap.php';
 
-	if ( in_array( strtolower( isset($_SERVER['argv'][1])?$_SERVER['argv'][1]:''), ['--help', '-h', '-help'] ) ) { throw new Exception( 'printar ajuda', 191130); }
-
 	$config = @include_once DIR_IMPORT_DB_9 . '/config/config.php';
-
 	if ( empty($config) ) { throw new Exception( "Não foi possível localizar o arquiv config/config.php" ); }
 
-	if ( in_array( strtolower( isset($_SERVER['argv'][1])?$_SERVER['argv'][1]:''), ['--bd', '-banco', '-database'] ) ) { throw new Exception( 'printar ajuda', 191131); }
-
 	$listaImportacao = @$config['import'];
-
 	if ( empty($listaImportacao) ) { throw new Exception( "Nenhuma entidade foi configurada para importação. Verifique se a tag \"import\" foi informada no arquivo \"config/config.php\".", 2); }
 
-	$comando = "mysqldump -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} > ".DIR_IMPORT_DB_9."/bkp/".date('Y-m-d_H-i_s')."_dump_{$config['databases']['target']['database']}.sql";
-	echo "Aguarde o backup ...\n";
-	exec($comando);	
-	echo "Backup executado com sucesso ...\n";
+	include_once DIR_IMPORT_DB_9 . "/config/routes.php";
 
+	/*echo "Aguarde o backup ...\n";
+	$comando = "mysqldump -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} > ".DIR_IMPORT_DB_9."/bkp/".date('Y-m-d_H-i_s')."_dump_{$config['databases']['target']['database']}.sql";
+	exec($comando);	
+	echo "Backup executado com sucesso ...\n";*/
+
+	// criando o schema de todas as tabelas do target e dou source
+	$Schema = new ImportDrupalDb9\Core\Schema();
+	$Schema->create();
+
+	// importando item a item da lista de importação
 	foreach( $listaImportacao as $_l => $_class )
 	{
 		$fullClass 	= "ImportDrupalDb9\\Import\\" . ucfirst( strtolower( $_class ) ) . "Import";
@@ -51,6 +52,19 @@ try
 			$comando = "mysql -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} < ".DIR_IMPORT_DB_9."/bkp/dump9.sql";
 			echo "\n";
 			exec( $comando );
+			break;
+
+		case 191131:
+			echo "Aguarde a importação do banco original ... ";
+			$comando = "mysql -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} < ".DIR_IMPORT_DB_9."/bkp/dump9.sql";
+			echo "\n";
+			exec( $comando );
+			break;
+
+		case 191132:
+			echo "Aguarde o sceneamento de todas as tabelas do source e target \n";
+			$Schema = new ImportDrupalDb9\Core\Schema();
+			$Schema->execute();
 			break;
 		
 		default:

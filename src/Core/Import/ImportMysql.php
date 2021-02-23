@@ -227,4 +227,44 @@ class ImportMysql {
 	{
 		return @$this->result->fetchAll( PDO::FETCH_ASSOC );
 	}
+
+	/**
+	 * Retorna a lista de todas as tabels do banco de dados.
+	 *
+	 * @return 	array $listTables 	Lista das tabelas.
+	 */
+	public function allTables( string $db='source' ) : array
+	{
+		$this->db( $db )->query( "SHOW TABLES" );
+		 
+		return $this->result->fetchAll( PDO::FETCH_COLUMN );
+	}
+
+	/**
+	 * Retorna a as propriedades de cada campo de uma tabela.
+	 *
+	 * @param 	string 	$db 		Origem do banco, source ou target.
+	 * @param 	string 	$table 		Nome da tabela
+	 * @return 	array 	$fields 	Matriz com todos as propriedades dde cada campo.
+	 */
+	public function describeTable ( string $db='source', string $table='' ) : array
+	{
+		$_listFields 	= $this->db( $db )->query( "DESCRIBE $table" )->toArray();
+
+		$fields 		= [];
+
+		foreach( $_listFields as $_l => $_arrProp )
+		{
+			$fieldName = @$_arrProp['Field'];
+
+			$fields[ $fieldName ]['name'] 	= $fieldName;
+			$fields[ $fieldName ]['type'] 	= @$_arrProp['Type'];
+			$fields[ $fieldName ]['null'] 	= @$_arrProp['Null'];
+			$fields[ $fieldName ]['key'] 	= @$_arrProp['Key'];
+			$fields[ $fieldName ]['default']= @$_arrProp['Default'];
+			$fields[ $fieldName ]['extra']  = @$_arrProp['Extra'];
+		}
+
+		return $fields;
+	}
 }

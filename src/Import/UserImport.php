@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace ImportDrupalDb9\Import;
 
 use ImportDrupalDb9\Core\Import\ImportMysql;
+use Exception;
 
 class UserImport extends ImportMysql {
 	/**
@@ -26,7 +27,7 @@ class UserImport extends ImportMysql {
 
 		$totalUsuariosImportados = $this->importUsers();
 
-		return "{$totalUsuariosImportados} importados com sucesso.\n";
+		return "{$totalUsuariosImportados} usuários importados com sucesso.\n";
 	}
 
 	/**
@@ -36,9 +37,75 @@ class UserImport extends ImportMysql {
 	 */
 	private function importUsers() : int
 	{
-		$res 	= $this->db('source')->query( $this->getSourceSqlUsers() )->toArray();
+		$sourceUsers 		= $this->db('source')->query( $this->getSourceSqlUsers() )->toArray();
 
-		return count( $res );
+		$targetTablePrefix 	= $this->configDb['target']['table_prefix'];
+
+		$uidJaIncluso 		= [];
+
+		$totalSalvos 		= 0;
+		//$S$E26OJxEl2d6TIpG1WLqB78VtXaFfuvOPoBADkUeVV3FxQ44kYf2A
+
+		foreach( $sourceUsers as $_l => $_arrFields )
+		{
+			if ( in_array( $_arrFields['uid'], $uidJaIncluso) ) continue;
+
+			$uidJaIncluso[] = $_arrFields['uid'];
+
+			try
+			{
+				// inserindo o usuário
+				$sqlInsert = "INSERT INTO {$targetTablePrefix}users";
+				$sqlInsert .= " ( uid, uuid, langcode ) VALUE";
+				$sqlInsert .= " ( {$_arrFields['uid']}, {$_arrFields['uid']}, '{$_arrFields['language']}' )";
+				$res = $this->db('target')->query( $sqlInsert );
+
+				// inserindo users_field_data
+				$sqlInsert = "INSERT INTO {$targetTablePrefix}users_field_data";
+				$sqlInsert .= " ( uid
+					, access
+					, changed
+					, created
+					, default_langcode
+					, init
+					, langcode
+					, login
+					, mail
+					, name
+					, pass
+					, preferred_langcode
+					, status
+					, timezone ) VALUE";
+				$sqlInsert .= " ( {$_arrFields['uid']}
+					, {$_arrFields['access']}
+					, {$_arrFields['created']}
+					, {$_arrFields['created']}
+					, 1
+					, '{$_arrFields['init']}'
+					, 'pt-br'
+					, '{$_arrFields['login']}'
+					, '{$_arrFields['mail']}'
+					, '{$_arrFields['name']}'
+					, '{$_arrFields['pass']}'
+					, '{$_arrFields['language']}'
+					, {$_arrFields['status']}
+					, '{$_arrFields['timezone']}' )";
+				$res = $this->db('target')->query( $sqlInsert );
+
+				// inserindo o user__roles
+
+				// inserindo o user__user_picture
+
+				// inserindo users_data
+
+				$totalSalvos++;
+			} catch ( Exception $e )
+			{
+				echo "{$e->getMessage()}\n";
+			}
+		}
+
+		return $totalSalvos;
 	}
 
 	/**
@@ -74,7 +141,8 @@ class UserImport extends ImportMysql {
 	{
 		$sourceTablePrefix = $this->configDb['source']['table_prefix'];
 
-		$sql  = "SELECT * FROM {$sourceTablePrefix}users u";
+		$sql  = "SELECT u.uid, u.name, u.pass, u.mail, u.login, u.created, u.access, u.status, u.timezone, u.language, u.init";
+		$sql .= " FROM {$sourceTablePrefix}users u";
 		$sql .= " LEFT JOIN {$sourceTablePrefix}users_roles ur  ON ur.uid  = u.uid";
 		$sql .= " LEFT JOIN {$sourceTablePrefix}userprotect upr ON upr.uid = u.uid";
 		$sql .= " WHERE u.uid>0 AND u.uid<100";
