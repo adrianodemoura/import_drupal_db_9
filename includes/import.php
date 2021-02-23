@@ -28,7 +28,7 @@ try
 		gravaLog( $retorno, 'resultado_importacao_'.$_class );
 	}
 
-	echo "success: ".count($listaImportacao)." entidade(s) importadas com sucesso. \n";
+	##echo "success: ".count($listaImportacao)." entidade(s) importadas com sucesso. \n";
 
 } catch ( Exception $e)
 {
