@@ -8,7 +8,6 @@ tmp/*
 tmp/cache/*
 tmp/bkp/*
 
-
 !logs/empty
 !tmp/cache/empty
 !tmp/bkp/empty

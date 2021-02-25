@@ -86,7 +86,7 @@ if ( !function_exists('logi') )
      */
     function logi($conteudo='', $nomeLog='log')
     {
-        $fp = fopen( DIR_IMPORT_DB_9 . DS . 'logs' . DS . $nomeLog.'.log', 'w' );
+        $fp = fopen( TMP . DS . 'logs' . DS . $nomeLog.'.log', 'w' );
 
         ob_start();
 

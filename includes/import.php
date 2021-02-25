@@ -13,12 +13,8 @@ try
 	$listaImportacao = @$config['import'];
 	if ( empty($listaImportacao) ) { throw new Exception( "Nenhuma entidade foi configurada para importação. Verifique se a tag \"import\" foi informada no arquivo \"config/config.php\".", 2); }
 
+	include_once DIR_IMPORT_DB_9 . "/src/Core/Routes.php";
 	include_once DIR_IMPORT_DB_9 . "/config/routes.php";
-
-	/*echo "Aguarde o backup ...\n";
-	$comando = "mysqldump -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} > ".DIR_IMPORT_DB_9."/bkp/".date('Y-m-d_H-i_s')."_dump_{$config['databases']['target']['database']}.sql";
-	exec($comando);	
-	echo "Backup executado com sucesso ...\n";*/
 
 	// criando o schema de todas as tabelas do target e dou source
 	$Schema = new ImportDrupalDb9\Core\Schema();
@@ -43,23 +39,33 @@ try
 {
 	switch ( $e->getCode() )
 	{
+		case 18001:
+			include_once DIR_IMPORT_DB_9 . '/docs/help/tag';
+			break;
+
 		case 191130:
 			include_once DIR_IMPORT_DB_9 . '/docs/help/help';
 			break;
 
 		case 191131:
-			echo "Aguarde a importação do banco original ... ";
-			$comando = "mysql -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} < ".DIR_IMPORT_DB_9."/bkp/dump9.sql";
-			echo "\n";
+			echo "Aguarde a importação do banco original ...\n";
+			echo "mysql -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} < " . TMP . "/bkp/dump9.sql";
 			exec( $comando );
+			echo "Importação executada com sucesso ...\n";
 			break;
 
 		case 191132:
+			echo "Aguarde o backup ...\n";
+			exec( "mysqldump -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} > " . TMP . "/bkp/".date('Y-m-d_H-i_s')."_dump_{$config['databases']['target']['database']}.sql" );
+			echo "Backup executado com sucesso ...\n";
+			break;
+
+		case 191133:
 			echo "Aguarde o sceneamento de todas as tabelas do source e target \n";
 			$Schema = new ImportDrupalDb9\Core\Schema();
 			$Schema->execute();
 			break;
-		
+
 		default:
 			echo "error: {$e->getMessage()} \n";
 			break;
