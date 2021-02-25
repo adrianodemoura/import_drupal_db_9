@@ -45,16 +45,14 @@ class UserImport extends ImportMysql {
 
 		$totalSalvos 		= 0;
 
-		$senhaPadrao 		= '$S$ECpkmLmTDrOnrL6u0aJb8f2amHuXkQKW0SIqOKQwxYQ6nsFO92lW';
-		// AdminDrupal9_6701! $S$E26OJxEl2d6TIpG1WLqB78VtXaFfuvOPoBADkUeVV3FxQ44kYf2A
-		// sgt219 $S$DBhGJs6wx.ImKwG/cG0vgv3xHgROPvhURS6E.es3yX5RZwLpSNub
-		// MudarSenha9_6701! $S$ECpkmLmTDrOnrL6u0aJb8f2amHuXkQKW0SIqOKQwxYQ6nsFO92lW
-
 		foreach( $sourceUsers as $_l => $_arrFields )
 		{
 			if ( in_array( $_arrFields['uid'], $uidJaIncluso) ) continue;
 
 			$uidJaIncluso[] = $_arrFields['uid'];
+
+			$senhaUsuario = '$S$ECpkmLmTDrOnrL6u0aJb8f2amHuXkQKW0SIqOKQwxYQ6nsFO92lW'; // MudarSenha9_6701!
+			//$senhaUsuario = "{$_arrFields['pass']}"; // senha do D7
 
 			try
 			{
@@ -66,34 +64,17 @@ class UserImport extends ImportMysql {
 
 				// inserindo users_field_data
 				$sqlInsert = "INSERT INTO {$targetTablePrefix}users_field_data";
-				$sqlInsert .= " ( uid
-					, access
-					, changed
-					, created
-					, default_langcode
-					, init
-					, langcode
-					, login
-					, mail
-					, name
+				$sqlInsert .= " ( uid, access, changed, created, default_langcode
+					, init, langcode, login
+					, mail, name
 					, pass
-					, preferred_langcode
-					, status
-					, timezone ) VALUE";
+					, preferred_langcode, status, timezone ) VALUE";
 				$sqlInsert .= " ( {$_arrFields['uid']}
-					, {$_arrFields['access']}
-					, {$_arrFields['created']}
-					, {$_arrFields['created']}
-					, 1
-					, '{$_arrFields['init']}'
-					, 'pt-br'
-					, '{$_arrFields['login']}'
-					, '{$_arrFields['mail']}'
-					, '{$_arrFields['name']}'
-					, '{$senhaPadrao}'
-					, '{$_arrFields['language']}'
-					, {$_arrFields['status']}
-					, '{$_arrFields['timezone']}' )";
+					, {$_arrFields['access']}, {$_arrFields['created']}, {$_arrFields['created']}, 1
+					, '{$_arrFields['init']}', 'pt-br', '{$_arrFields['login']}'
+					, '{$_arrFields['mail']}', '{$_arrFields['name']}'
+					, '{$senhaUsuario}'
+					, '{$_arrFields['language']}', {$_arrFields['status']}, '{$_arrFields['timezone']}' )";
 				$res = $this->db('target')->query( $sqlInsert );
 
 				// inserindo o user__roles

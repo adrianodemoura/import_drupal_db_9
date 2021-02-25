@@ -54,13 +54,6 @@ try
 			exec( $comando );
 			break;
 
-		case 191131:
-			echo "Aguarde a importação do banco original ... ";
-			$comando = "mysql -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} < ".DIR_IMPORT_DB_9."/bkp/dump9.sql";
-			echo "\n";
-			exec( $comando );
-			break;
-
 		case 191132:
 			echo "Aguarde o sceneamento de todas as tabelas do source e target \n";
 			$Schema = new ImportDrupalDb9\Core\Schema();
