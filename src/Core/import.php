@@ -3,25 +3,20 @@ declare(strict_types=1);
 
 try
 {
-	define( 'DIR_IMPORT_DB_9', str_replace( ['/includes', '/bin'], '', __DIR__ ) );
+	define( 'DIR_IMPORT_DB_9', str_replace( ['/includes', '/bin', '/src', '/Core'], '', __DIR__ ) );
 
-	include_once DIR_IMPORT_DB_9 . '/includes/bootstrap.php';
+	include_once DIR_IMPORT_DB_9 . '/src/Core/bootstrap.php';
 
-	$config = @include_once DIR_IMPORT_DB_9 . '/config/config.php';
-	if ( empty($config) ) { throw new Exception( "Não foi possível localizar o arquiv config/config.php" ); }
+	include_once DIR_IMPORT_DB_9 . '/vendor/autoload.php';
 
-	$listaImportacao = @$config['import'];
-	if ( empty($listaImportacao) ) { throw new Exception( "Nenhuma entidade foi configurada para importação. Verifique se a tag \"import\" foi informada no arquivo \"config/config.php\".", 2); }
+	include_once DIR_IMPORT_DB_9 . '/src/Core/global.php';
 
-	include_once DIR_IMPORT_DB_9 . "/src/Core/Routes.php";
+	include_once DIR_IMPORT_DB_9 . "/src/Core/routes.php";
 
 	include_once DIR_IMPORT_DB_9 . "/config/routes.php";
 
-	// criando o schema de todas as tabelas do target e dou source
-	$Schema = new ImportDrupalDb9\Core\Schema();
-	$Schema->create();
-
-	// importando item a item da lista de importação
+	$listaImportacao = @$config['import'];
+	if ( empty($listaImportacao) ) { throw new Exception( "Nenhuma entidade foi configurada para importação. Verifique se a tag \"import\" foi informada no arquivo \"config/config.php\".", 2); }
 	foreach( $listaImportacao as $_l => $_class )
 	{
 		$fullClass 	= "ImportDrupalDb9\\Import\\" . ucfirst( strtolower( $_class ) ) . "Import";
@@ -35,7 +30,7 @@ try
 		echo $retorno."\n";
 	}
 
-	echo "\nfim: ".count($listaImportacao)." impotações executadas com sucesso.\n";
+	echo "fim: ".count($listaImportacao)." impotações executadas com sucesso.\n";
 } catch ( Exception $e )
 {
 	switch ( $e->getCode() )
@@ -62,9 +57,8 @@ try
 			break;
 
 		case 191133:
-			echo "Aguarde o sceneamento de todas as tabelas do source e target \n";
-			$Schema = new ImportDrupalDb9\Core\Schema();
-			$Schema->execute();
+			$Schema = new ImportDrupalDb9\Core\Schema\Schema();
+			$Schema->create();
 			break;
 
 		default:

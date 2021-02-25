@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace ImportDrupalDb9\Core;
+namespace ImportDrupalDb9\Core\Schema;
 
 use ImportDrupalDb9\Core\Import\ImportMysql;
 use Exception;
@@ -13,17 +13,15 @@ class Schema extends ImportMysql {
 	 */
 	public function create()
 	{
+		echo "Aguarde o escaneamento de todas as tabelas do source e target \n";
+
 		$lista = ['source'=>[], 'target'=>[] ];
 
 		$this->setSource();
 
 		$this->setTarget();
 
-	}
-
-	public function read(  )
-	{
-		return $retorno;
+		echo "Escaneamento executado com sucesso. O Schema foi criado em \"" . DIR_IMPORT_DB_9 . "/tmp\"  \n";
 	}
 
 	private function setSource()
@@ -33,7 +31,7 @@ class Schema extends ImportMysql {
 		{
 			$lista['source'][$_table] = $this->describeTable( 'source', $_table );
 		}
-		logi( json_encode( $lista['source'] ), 'schema_source' );
+		gravaLog( json_encode( $lista['source'] ), 'schema_source' );
 	}
 
 	private function setTarget()
@@ -43,7 +41,7 @@ class Schema extends ImportMysql {
 		{
 			$lista['target'][$_table] = $this->describeTable( 'target', $_table );
 		}
-		logi( json_encode( $lista['target'] ), 'schema_target' );
+		gravaLog( json_encode( $lista['target'] ), 'schema_target' );
 	}
 
 }
