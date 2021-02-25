@@ -2,12 +2,12 @@
 config/config.php
 
 vendor/*
-logs/*
 tmp/*
 
 tmp/cache/*
+tmp/logs/*
 tmp/bkp/*
 
-!logs/empty
 !tmp/cache/empty
+!tmp/logs/empty
 !tmp/bkp/empty

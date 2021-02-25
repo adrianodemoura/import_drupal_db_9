@@ -14,6 +14,7 @@ try
 	if ( empty($listaImportacao) ) { throw new Exception( "Nenhuma entidade foi configurada para importação. Verifique se a tag \"import\" foi informada no arquivo \"config/config.php\".", 2); }
 
 	include_once DIR_IMPORT_DB_9 . "/src/Core/Routes.php";
+
 	include_once DIR_IMPORT_DB_9 . "/config/routes.php";
 
 	// criando o schema de todas as tabelas do target e dou source
