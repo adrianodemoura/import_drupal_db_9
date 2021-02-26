@@ -27,7 +27,7 @@ class UserImport extends ImportMysql {
 
 		$totalUsuariosImportados = $this->importUsers();
 
-		return "{$totalUsuariosImportados} usuários importados com sucesso.\n";
+		return "{$totalUsuariosImportados} usuários importados com sucesso. Não esqueça de limpar o cache no Drupal 9\n";
 	}
 
 	/**
@@ -51,8 +51,6 @@ class UserImport extends ImportMysql {
 
 			$uidJaIncluso[] = $_arrFields['uid'];
 
-			$senhaUsuario 	= "{$_arrFields['pass']}"; // senha do D7
-
 			try
 			{
 				// inserindo o usuário
@@ -72,7 +70,7 @@ class UserImport extends ImportMysql {
 					, {$_arrFields['access']}, {$_arrFields['created']}, {$_arrFields['created']}, 1
 					, '{$_arrFields['init']}', 'pt-br', '{$_arrFields['login']}'
 					, '{$_arrFields['mail']}', '{$_arrFields['name']}'
-					, '{$senhaUsuario}'
+					, '{$_arrFields['pass']}'
 					, '{$_arrFields['language']}', {$_arrFields['status']}, '{$_arrFields['timezone']}' )";
 				$res = $this->db('target')->query( $sqlInsert );
 

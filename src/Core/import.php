@@ -30,7 +30,7 @@ try
 		echo $retorno."\n";
 	}
 
-	echo "fim: ".count($listaImportacao)." impotações executadas com sucesso.\n";
+	echo "fim: ".count($listaImportacao)." importações executadas com sucesso.\n";
 } catch ( Exception $e )
 {
 	switch ( $e->getCode() )
