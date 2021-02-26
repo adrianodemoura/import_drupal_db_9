@@ -4,8 +4,8 @@ config/config.php
 vendor/*
 tmp/*
 
+tmp/storage/*
 tmp/logs/*
-tmp/bkp/*
 
+!tmp/storage/empty
 !tmp/logs/empty
-!tmp/bkp/empty

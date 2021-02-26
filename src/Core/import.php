@@ -45,14 +45,14 @@ try
 
 		case 191131:
 			echo "Aguarde a importação do banco original ...\n";
-			echo "mysql -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} < " . TMP . "/bkp/dump9.sql";
+			echo "mysql -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} < " . TMP . "/storage/dump9.sql";
 			exec( $comando );
 			echo "Importação executada com sucesso ...\n";
 			break;
 
 		case 191132:
 			echo "Aguarde o backup ...\n";
-			exec( "mysqldump -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} > " . TMP . "/bkp/".date('Y-m-d_H-i_s')."_dump_{$config['databases']['target']['database']}.sql" );
+			exec( "mysqldump -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} > " . TMP . "/storage/".date('Y-m-d_H-i_s')."_dump_{$config['databases']['target']['database']}.sql" );
 			echo "Backup executado com sucesso ...\n";
 			break;
 
