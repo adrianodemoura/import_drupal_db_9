@@ -43,20 +43,19 @@ try
 			include_once DIR_IMPORT_DB_9 . '/docs/help/help';
 			break;
 
-		case 191131:
+		case 191131: // bin/import --backup
 			echo "Aguarde a importação do banco original ...\n";
-			echo "mysql -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} < " . TMP . "/storage/dump9.sql";
-			exec( $comando );
+			exec( "mysql -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} < " . TMP . "/storage/dump9.sql" );
 			echo "Importação executada com sucesso ...\n";
 			break;
 
-		case 191132:
+		case 191132: // bin/import --backup
 			echo "Aguarde o backup ...\n";
 			exec( "mysqldump -u{$config['databases']['target']['username']} -p'{$config['databases']['target']['password']}' {$config['databases']['target']['database']} > " . TMP . "/storage/".date('Y-m-d_H-i_s')."_dump_{$config['databases']['target']['database']}.sql" );
 			echo "Backup executado com sucesso ...\n";
 			break;
 
-		case 191133:
+		case 191133: // bin/import --schema
 			$Schema = new ImportDrupalDb9\Core\Schema\Schema();
 			$Schema->create();
 			break;

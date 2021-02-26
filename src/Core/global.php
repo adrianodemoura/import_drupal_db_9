@@ -62,31 +62,7 @@ if ( !function_exists('gravaLog') )
      */
     function gravaLog($conteudo='', $nomeLog='log', $tipo='w')
     {
-        $fp = fopen( TMP . DS . $nomeLog.'.log', $tipo);
-
-        ob_start();
-
-        echo print_r($conteudo, true);
-
-        $saida = ob_get_clean();
-        fwrite($fp, $saida.PHP_EOL);
-        fclose($fp);
-    }
-}
-
-if ( !function_exists('logi') )
-{
-    /**
-     * Escreve um Log no diretório temporário
-     *
-     * @param   string  $log        Nome do arquivo log.
-     * @param   mixed   $conteudo   Conteúdo do logo.
-     * @param   string  $tipo       Tipo da escrita, utiliza a+ para continuar a escrita, o padrão é re-escrever o arquivo.
-     * @return  void
-     */
-    function logi($conteudo='', $nomeLog='log')
-    {
-        $fp = fopen( TMP . DS . 'logs' . DS . $nomeLog.'.log', 'w' );
+        $fp = fopen( TMP . DS . 'logs' . DS . $nomeLog.'.log', $tipo);
 
         ob_start();
 

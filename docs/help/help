@@ -7,3 +7,11 @@ Siga o exemplo do arquivo "config.example.php"
 
 Você pode colocar também a ordem com as tabelas serão importadas.
 
+--help 		Imprimi este página.
+
+--backup 	Realiza o backup do banco de dados target. Será gravado no diretório /tmp/storage
+
+--restore 	Realiza a recuperação do banco de dados target. O arquivo dump deve estar em /tmp/storage
+
+--schema 	Realiza o cache do schema das tabelas dos dois bancos, source e target. Será gravado no diretório /tmp/schema
+

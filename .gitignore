@@ -5,7 +5,9 @@ vendor/*
 tmp/*
 
 tmp/storage/*
+tmp/schema/*
 tmp/logs/*
 
 !tmp/storage/empty
+!tmp/schema/empty
 !tmp/logs/empty

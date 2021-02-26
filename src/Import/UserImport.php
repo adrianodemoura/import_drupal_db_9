@@ -102,11 +102,11 @@ class UserImport extends ImportMysql {
 	{
 		if ( !$this->cleanTarget ) return false;
 
-		$targetTablePrefix = $this->configDb['target']['table_prefix'];
+		$targetTablePrefix 	= $this->configDb['target']['table_prefix'];
 
-		$totalUsuarios = @$this->db('target')->query( "SELECT COUNT(1) as total_usuarios FROM {$targetTablePrefix}users_field_data" )->toArray()['total_usuarios'];
+		$totalUsuarios 		= @$this->db('target')->query( "SELECT COUNT(1) as total_usuarios FROM {$targetTablePrefix}users_field_data" )->toArray()['total_usuarios'];
 
-		$listaTabelasUsuario = ['users_field_data', 'users'];
+		$listaTabelasUsuario= ['users_field_data', 'users'];
 
 		foreach( $listaTabelasUsuario as $_l => $_tabela )
 		{
