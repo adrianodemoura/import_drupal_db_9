@@ -23,14 +23,10 @@ try
 
 		$Import 	= new $fullClass();
 
-		$retorno 	= $Import->execute();
-
-		gravaLog( $retorno, 'resultado_importacao_'.$_class );
-
-		echo $retorno."\n";
+		$Import->execute();
 	}
 
-	echo "fim: ".count($listaImportacao)." importações executadas com sucesso.\n";
+	echo "\nFim da importação.\n\n";
 } catch ( Exception $e )
 {
 	switch ( $e->getCode() )

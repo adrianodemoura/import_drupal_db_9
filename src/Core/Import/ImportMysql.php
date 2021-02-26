@@ -66,12 +66,24 @@ class ImportMysql {
 	protected $transactionCounter = 0;
 
 	/**
+	 * modo verbose, printa todos os comandos.
+	 *
+	 * @var 	boolean
+	 */
+	private $verbose = 0;
+
+	/**
 	 * Método start
 	 *
 	 * @return 	void
 	 */
 	public function __construct()
 	{
+		if ( in_array( '--verbose', $_SERVER['argv'] ) )
+		{
+			$this->__set('verbose', 1);
+		}
+
 		$this->connect();
 	}
 
@@ -91,7 +103,7 @@ class ImportMysql {
 	 *
 	 * @return void
 	 */
-	private function begin()
+	protected function begin()
 	{
 		return ( !$this->transactionCounter++ ) ? $this->targetDb->beginTransaction() : $this->transactionCounter >= 0;
 	}
@@ -101,7 +113,7 @@ class ImportMysql {
 	 *
 	 * @return mixed
 	 */
-	private function commit()
+	protected function commit()
 	{
 		return (!--$this->transactionCounter) ? $this->targetDb->commit() : $this->transactionCounter >= 0;
 	}
@@ -111,7 +123,7 @@ class ImportMysql {
 	 *
 	 * @return mixed
 	 */
-	private function rollback()
+	protected function rollback()
 	{
 		if ( $this->transactionCounter >= 0 )
         {
@@ -171,11 +183,9 @@ class ImportMysql {
 	 *
 	 * @return 	string 	$msg 	Mensagem da operação.
 	 */
-	public function execute() : string
+	public function execute()
 	{
-		$msg = "";
-
-		return $msg;
+		//
 	}
 
 	/**
@@ -205,7 +215,8 @@ class ImportMysql {
 	 */
 	public function query( string $sql="" )
 	{
-		if ( $this->logSql ) gravaLog( date("Y-m-d H:i:s") . " " . $this->selectDb . " " . $sql, 'sql_'.$this->selectDb, 'a+' );
+		//if ( $this->logSql ) gravaLog( date("Y-m-d H:i:s") . " " . " " . str_replace("\n", "", $sql), 'sql_'.$this->selectDb, 'a+' );
+		if ( $this->logSql ) gravaLog( date("Y-m-d H:i:s") . " " . $sql, 'sql_'.$this->selectDb, 'a+' );
 
 		if ( $this->selectDb === 'source' )
 		{

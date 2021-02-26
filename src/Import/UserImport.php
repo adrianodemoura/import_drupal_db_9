@@ -15,19 +15,29 @@ class UserImport extends ImportMysql {
 	private $cleanTarget = true;
 
 	/**
-	 * Executa a importação dos usuários
+	 * Executa a importação dos usuários.
 	 *
-	 * @return 	string 	$msg 	Mensagem de estatus.
+	 * @return 	void
 	 */
-	public function execute() : string
+	public function execute()
 	{
 		$this->__set('logSql', true );
 
-		if ( $this->cleanTarget ) $this->cleanTarget();
+		$this->db('target')->begin();
+		try 
+		{
+			if ( $this->cleanTarget ) $this->cleanTarget();
+		
+			$totalUsuariosImportados = $this->importUsers();
 
-		$totalUsuariosImportados = $this->importUsers();
+			$this->db('target')->commit();
 
-		return "{$totalUsuariosImportados} usuários importados com sucesso. Não esqueça de limpar o cache no Drupal 9\n";
+			echo "{$totalUsuariosImportados} usuários importados com sucesso. Não esqueça de limpar o cache no Drupal 9\n";
+		} catch ( Exception $e )
+		{
+			$this->db('target')->rollback();
+			echo "{$e->getCode()} - {$e->getMessage()}";
+		}
 	}
 
 	/**
@@ -41,7 +51,7 @@ class UserImport extends ImportMysql {
 
 		$targetTablePrefix 	= $this->configDb['target']['table_prefix'];
 
-		$uidJaIncluso 		= [];
+		$uidJaIncluso 		= [0];
 
 		$totalSalvos 		= 0;
 
@@ -51,40 +61,30 @@ class UserImport extends ImportMysql {
 
 			$uidJaIncluso[] = $_arrFields['uid'];
 
-			try
-			{
-				// inserindo o usuário
-				$sqlInsert = "INSERT INTO {$targetTablePrefix}users";
-				$sqlInsert .= " ( uid, uuid, langcode ) VALUE";
-				$sqlInsert .= " ( {$_arrFields['uid']}, {$_arrFields['uid']}, '{$_arrFields['language']}' )";
-				$res = $this->db('target')->query( $sqlInsert );
+			// inserindo o usuário
+			$sqlInsert = "INSERT INTO {$targetTablePrefix}users";
+			$sqlInsert .= " ( uid, uuid, langcode ) VALUE";
+			$sqlInsert .= " ( {$_arrFields['uid']}, {$_arrFields['uid']}, '{$_arrFields['language']}' )";
+			$res = $this->db('target')->query( $sqlInsert );
 
-				// inserindo users_field_data
-				$sqlInsert = "INSERT INTO {$targetTablePrefix}users_field_data";
-				$sqlInsert .= " ( uid, access, changed, created, default_langcode
-					, init, langcode, login
-					, mail, name
-					, pass
-					, preferred_langcode, status, timezone ) VALUE";
-				$sqlInsert .= " ( {$_arrFields['uid']}
-					, {$_arrFields['access']}, {$_arrFields['created']}, {$_arrFields['created']}, 1
-					, '{$_arrFields['init']}', 'pt-br', '{$_arrFields['login']}'
-					, '{$_arrFields['mail']}', '{$_arrFields['name']}'
-					, '{$_arrFields['pass']}'
-					, '{$_arrFields['language']}', {$_arrFields['status']}, '{$_arrFields['timezone']}' )";
-				$res = $this->db('target')->query( $sqlInsert );
+			// inserindo users_field_data
+			$sqlInsert = "INSERT INTO {$targetTablePrefix}users_field_data";
+			$sqlInsert .= " ( uid, access, changed, created, default_langcode
+				, init, langcode, login
+				, mail, name
+				, pass
+				, preferred_langcode, status, timezone ) VALUE";
+			$sqlInsert .= " ( {$_arrFields['uid']}
+				, {$_arrFields['access']}, {$_arrFields['created']}, {$_arrFields['created']}, 1
+				, '{$_arrFields['init']}', 'pt-br', '{$_arrFields['login']}'
+				, '{$_arrFields['mail']}', '{$_arrFields['name']}'
+				, '{$_arrFields['pass']}'
+				, '{$_arrFields['language']}', {$_arrFields['status']}, '{$_arrFields['timezone']}' )";
+			$res = $this->db('target')->query( $sqlInsert );
 
-				// inserindo o user__roles
+			if ( $this->__get('verbose') ) echo "inserindo usuário id: {$_arrFields['uid']} \n";
 
-				// inserindo o user__user_picture
-
-				// inserindo users_data
-
-				$totalSalvos++;
-			} catch ( Exception $e )
-			{
-				echo "{$e->getMessage()}\n";
-			}
+			$totalSalvos++;
 		}
 
 		return $totalSalvos;
@@ -123,11 +123,27 @@ class UserImport extends ImportMysql {
 	{
 		$sourceTablePrefix = $this->configDb['source']['table_prefix'];
 
-		$sql  = "SELECT u.uid, u.name, u.pass, u.mail, u.login, u.created, u.access, u.status, u.timezone, u.language, u.init";
-		$sql .= " FROM {$sourceTablePrefix}users u";
-		$sql .= " LEFT JOIN {$sourceTablePrefix}users_roles ur  ON ur.uid  = u.uid";
-		$sql .= " LEFT JOIN {$sourceTablePrefix}userprotect upr ON upr.uid = u.uid";
-		$sql .= " WHERE u.uid>0 AND u.uid<100";
+		$sql  = "SELECT
+					tu.uid,
+					tu.name,
+					tu.pass,
+					tu.mail,
+					tu.login,
+					tu.created,
+					tu.access,
+					tu.status,
+					tu.timezone,
+					tu.language,
+					tu.init,
+					tr.name as name_role,
+					tr.rid,
+					tr.weight 
+				FROM
+					tb_users tu
+				LEFT JOIN tb_userprotect tup ON tup.uid = tu.uid
+				LEFT JOIN tb_users_roles tur ON tur.uid = tu.uid
+				LEFT JOIN tb_role tr ON tr.rid = tur.rid";
+		//$sql .= " WHERE tu.uid>0 AND tu.uid<100";
 
 		return $sql;
 	}
