@@ -51,8 +51,7 @@ class UserImport extends ImportMysql {
 
 			$uidJaIncluso[] = $_arrFields['uid'];
 
-			$senhaUsuario = '$S$ECpkmLmTDrOnrL6u0aJb8f2amHuXkQKW0SIqOKQwxYQ6nsFO92lW'; // MudarSenha9_6701!
-			//$senhaUsuario = "{$_arrFields['pass']}"; // senha do D7
+			$senhaUsuario 	= "{$_arrFields['pass']}"; // senha do D7
 
 			try
 			{
